@@ -14,6 +14,23 @@ public class LocalNetworkFinder : MonoBehaviour
     [SerializeField] public Text debugText;
     public ChatConnection _chatConnection;
     [SerializeField] private InputField friendCodeInput;
+    
+    
+    void Start()
+    {
+        string localAddress = GetLocalIPAddress();
+        //shows the output on mobile by displaying a text object
+        Debug(localAddress);
+        //getipprefix also stores value for int lastByte
+        prefix = GetIPPrefix(GetLocalIPAddress());
+        //use lastByte as the index, starts at 0 ends at 255
+        friendCodeText.text = _byteWords[lastByte].Word;
+        string localIpEndpoint = localAddress + ":" + 27504;
+        client = new UdpClient();
+        client.Client.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.ReuseAddress, true);
+        client.Client.Bind(new IPEndPoint(IPAddress.Parse(EndpointStringToIP(localIpEndpoint)), 27504));
+    }
+    
     string GetLocalIPAddress()
     {
         var host = Dns.GetHostEntry(Dns.GetHostName());
@@ -29,7 +46,6 @@ public class LocalNetworkFinder : MonoBehaviour
     }
     private Thread receiveThread;
     private UdpClient client;
-    private UdpClient sendClient;
     public bool isConnected = false;
     public Transform chatFrame;
 
@@ -43,7 +59,6 @@ public class LocalNetworkFinder : MonoBehaviour
     {
         receiveThread?.Abort();
         client?.Close();
-        sendClient?.Close();
     }
     public string temp = "";
     int ByteWordToIndex(string word)
@@ -51,6 +66,7 @@ public class LocalNetworkFinder : MonoBehaviour
         for (int i=0;i<_byteWords.Length;++i)
             if (_byteWords[i].Word == word)
                 return i;
+        //-1 indicates the input string was invalid and the result should be discarded
         return -1;
     }
     public void Connect()
@@ -63,6 +79,8 @@ public class LocalNetworkFinder : MonoBehaviour
         if (finalByte == -1)
         {
             UnityEngine.Debug.Log("You put an invalid friend code.");
+            //temp is a string that gets used by the main thread to update a text object
+            //its current primary purpose is debugging on mobile devices
             temp = "You put an invalid friend code.";
             friendCodeInput.text = "";
             friendCodeInput.Select();
@@ -81,7 +99,10 @@ public class LocalNetworkFinder : MonoBehaviour
                     {    //TODO: port is arbitrary and will be turned into a variable
                         client.Send(datap, datap.Length, destinationIP, 27504);
                         temp = "sent a message to " + destinationIP + " from " + localIpEndpoint;
-                        Thread.Sleep(1000);
+                        //the wait time below was used to automatically connect clients using UDP broadcasts to detect each other
+                        //it allowed the other client to open a listener before trying to connect
+                        //it's no longer necessary since the model was changed to accomodate modern android systems.
+                        //Thread.Sleep(1000);
                         _chatConnection.BeginConnection(destinationIP, 27504);
                         return;
                     }
@@ -131,19 +152,6 @@ public class LocalNetworkFinder : MonoBehaviour
                 }
             });
     }
-    void Start()
-    {
-        //shows the output on mobile by displaying a text object
-        Debug(GetLocalIPAddress());
-        //getipprefix also stores value for int lastByte
-        //use lastByte as the index, starts at 0 ends at 255
-        friendCodeText.text = _byteWords[lastByte].Word;
-        string localIpEndpoint = GetLocalIPAddress() + ":" + 27504;
-        client = new UdpClient();
-        client.Client.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.ReuseAddress, true);
-        client.Client.Bind(new IPEndPoint(IPAddress.Parse(EndpointStringToIP(localIpEndpoint)), 27504));
-    }
-
     IEnumerator BroadCastMyIP(UdpClient client, byte[] data)
     {
         string prefix = GetIPPrefix(GetLocalIPAddress());
@@ -173,6 +181,7 @@ public class LocalNetworkFinder : MonoBehaviour
 
         return result;
     }
+    private string prefix = "";
     private int lastByte = 0;
     private float timer = 0.25f;
     [SerializeField] private Text friendCodeText;
