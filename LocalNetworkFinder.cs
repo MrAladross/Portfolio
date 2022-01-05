@@ -215,6 +215,9 @@ public class LocalNetworkFinder : MonoBehaviour
         return 27509;
     }
 
+//These were taken from a list of 1000 3-letter words from a scrabble website, then manually trimmed to 
+//exclude trigger words or inappropriate words, then reduced down to 256 words. They are displayed as 
+//an on screen text to take the place of having users type in an IP address.
     private ByteWord[] _byteWords =new ByteWord[]
     {
         new ByteWord(0, "ace"),
