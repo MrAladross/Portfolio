@@ -7,3 +7,5 @@ and wrote a program to re-organize the data in the required format so that the e
 
 First iterations had the program exporting data into a text file, but this proved cumbersome to use.
 In order to minimize the number of clicks, I made sure the program started and ended with data in the clipboard.
+
+I included a feature to manually edit how a student name is processed, just in case some names were commonly left out.
