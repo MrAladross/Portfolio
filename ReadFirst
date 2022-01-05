@@ -1,0 +1,21 @@
+These are a few of the projects I've worked on over the past couple years. Listed from most recent to least recent:
+
+NetworkSystem  (2022)
+Chess          (2021)
+BubblePop      (2021)
+BranchedStory  (2020)
+CardClass      (2020)
+GradeTransferer(2020)
+KidsMath       (2019)
+MemoryGame     (2019)
+
+
+I included the network system as an example of a system I created that I particularly like. The core pieces are easily adaptable for multiple use cases.
+The chess project was included to show a completed project. It is classical chess where two players will take turns on one device.
+The bubble pop example includes the trajectory prediction. The game was eventually completed, but files are currently inaccessible.
+The branched story example shows familiarity with UI.
+The Card class examples show how I would structure data for something like a classical card game, or a trading card game.
+The GradeTransferer extension shows my ability to take data and process it in a way to make it useful for other existing services.
+The KidsMath game shows my ability to make simple but effective decisions.
+
+The memory game example shows past bad habits that I have grown out of.
