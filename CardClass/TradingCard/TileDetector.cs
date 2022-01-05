@@ -5,6 +5,10 @@ using System.Linq;
 
 public class TileDetector : MonoBehaviour
 {
+
+//many of these can be made private, but this project was from a 
+// couple years ago beforw I started thinking about what should
+// or shouldn't be made private or public
     public Tile waterTile;
     public Tile circleTile;
     public Tile glowTile;
