@@ -1,0 +1,9 @@
+As a high school teacher, my district had access to a service called GradeTransferer. It was a chrome extension that allowed
+us to copy grades from one website into another. Limitations made it less than useful because the services it worked for 
+already had native grade transfer capabilities underway and these were platforms that probably wouldn't be used concurrently. 
+
+I did some investigation and discovered the required format for this extension to work. I then took data from websites I used
+and wrote a program to re-organize the data in the required format so that the extension could then transfer grades. 
+
+First iterations had the program exporting data into a text file, but this proved cumbersome to use.
+In order to minimize the number of clicks, I made sure the program started and ended with data in the clipboard.
