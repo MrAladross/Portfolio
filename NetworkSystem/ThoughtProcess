@@ -1,0 +1,41 @@
+The original plan was to make an asynchronous network system to pass messages between clients connected on the same wifi network.
+To test the system, an instant messenger scene was created. 
+
+LocalNetworkFinder searches for a match
+ChatConnection forms a TCP connection
+ChatLog : EventListenerBase (: Monobehaviour)   handles receipt of messages through the socket.
+GameEvent is a scriptable object used for various events. New events just need to be added to the enum list and the listener
+  can be created. Listeners derive from the base listener class so that only the handling method needs to be written.
+
+
+I wanted to create a custom system and implement automatic local player discovery, as well as make the system compatible with my  
+custom event class, used in unity.
+
+First iteration:
+  Use UDP broadcasts to tell the network "I'm alive" to discover other clients. 
+  System worked, but original code for sockets only listened for local ports. 
+  
+Second iteration:
+  Updated code to listen for external ports, connections discovered and automatically established. 
+  Feature added to detect when clients disconnected and handle it gracefully. 
+  Testing was successful on windows, but failed when an android client was used.
+  Android testing was successful as host but failed as client. This led me to think it was the broadcast not being received.
+  Android also wasn't producing the proper debug text objects. Investigation led me to the realization TCPConnectionInformation wasn't available.
+  
+Third iteration: 
+  Research pointed to android devices blocking broadcasts. System changes from fully automatic local client detection to manual connections.
+  Since local home networks share the first 3 bytes, I wrote a method to capture this information from the local client. Rather than
+  having a user type in the final byte as an integer, I decided to map the integers 0 - 255 to 3-letter words. This decision was to
+  improve user experience. Typing in an IP address can make people nervous, but displaying a simple codeword, and communicating that to 
+  a friend would feel relatively safe. 
+  
+  UI displays a text for the final byte, that information is shared with a friend by word of mouth (or text message), then the friend types it
+  in and the program searches a list to find the corresponding byte. IP address is assembled and connection established. 
+  At this stage, the program runs, but the framerate is low. Network rate is at 10/s, and game loop is at 45/s. I update the network rate to 20/s. 
+  Curiously, the program becomes more responsive and framerate improves. I realize at this point the sockets were synchronous and blocking main thread.
+  
+Fourth iteration:
+  Multi-threading is implemented. Solution works with console application, but fails in unity. Unity gameobjects can not be referenced in alternate threads.
+  At this point, the test scene is an instant messenger. The messages are sent and text objects are instantiated. In order to maintain multi-threading,
+  instead of referencing a gameobject to add another line of text, I add messages to a List in the alternate thread and remove them from the list for processing 
+  in the main thread. This fixes the responsiveness issues and bumps framerates up to 1500/s game loop. The network rate remains the same at 20/s.
