@@ -1,0 +1,10 @@
+Similar to Goosebumps choose your own horror stories, this was a webGL build used to display and traverse stories with multiple options. 
+
+Multiple stories would be displayed on a main menu screen. Choosing a story would take a user to the first page.
+
+Stories would be written with a specific format in mind and the format would allow the program to parse information and direct the reader appropriately.
+Once parsed, the program would update the text and present new choices at the end of the "page".
+
+A scroll rect would allow the user to move through various lines.
+
+Scaling would be necessary to ensure things looked appropriate on various devices. (hardcoded values were selected based on screen size while testing
