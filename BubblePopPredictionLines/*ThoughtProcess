@@ -1,0 +1,20 @@
+The goal is to create a bubble pop system where prediction lines are projected from the camera to show where 
+the bubble will go when shot.
+
+I started by studying images of bubble pop games to understand the grid system. I used mathematical calculations
+to determine how far apart bubbles should be, then confirmed these ideas by creating a grid of 2D circle images.
+Each bubble has up to 6 neighbors, so this information would later be used in the scoring and popping processes.
+
+The GridCalculator class was strictly for grid related operations. 
+The LookAtMouse class caused the cannon to look at the mouse and generate path lines.
+
+
+The idea behind the LookAtMouse class was to first rotate the cannon towards the input mouseposition,
+then to render a dotted line in that direction. By raycasting towards a barrier wall, the program could detect
+if it was time to reverse directions. This would be followed with subsequent raycasts. While I could limit
+the user's ability to point the cannon sideways (thus preventing infinite bounce loops) I chose to also limit 
+the number of times the recursive formula would run to 20. This means it would stop checking for bounces after 20.
+If there was a future change that removed angle restrictions, the 20 maximum bounce limit would kick in.
+
+Since every time the ball contacted a wall it would reverse direction but continue upward, I calculated reflections 
+by changing the sign of the x velocity and starting another raycast.
