@@ -1,39 +1,13 @@
-﻿using System;
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using UnityEngine;
 using System.Net;
-using System.Net.Sockets;
 using System.Text;
 using System.Net.NetworkInformation;
-using System.Text;
-using System.Threading.Tasks;
-using System.Threading;
 using UnityEngine.UI;
-public class StateObject
-{
-    // Size of receive buffer.  
-    public const int BufferSize = 1024;
-
-    // Receive buffer.  
-    public byte[] buffer = new byte[BufferSize];
-
-    // Received data string.
-    public StringBuilder sb = new StringBuilder();
-
-    // Client socket.
-    public Socket workSocket = null;
-}  
 public class ChatConnection : MonoBehaviour
 {
-    //TODO: still need to wire up a couple things including moving messages from these lists to chatlog via displaymessage
-    //TODO: still need to collect chat inputs without blocking send/receive
-    //TODO: still need to beginconnection once connection is found.
-
-
-    private ManualResetEvent _manualResetEvent = new ManualResetEvent(false);
-
     public void QueueMessage()
     {
         _messagesToSend.Add(username+": "+_messageInputField.text);
@@ -62,7 +36,6 @@ public class ChatConnection : MonoBehaviour
 
     [SerializeField] private LocalNetworkFinder _localNetworkFinder;
 
-    [SerializeField]
     public HashSet<string> ipaddresses = new HashSet<string>();
     private void Awake()
     {
@@ -128,11 +101,6 @@ public class ChatConnection : MonoBehaviour
                     {
                         connection.Listen(1);
                         Debug.Log("listening");
-                        
-                        //TODO: implement async socket once familiarized with the data flow
-                     //   _manualResetEvent.Reset();
-                     //   connection.BeginAccept(new AsyncCallback(AcceptCallback), connection);
-                     //   _manualResetEvent.WaitOne();
                         connection = connection.Accept();
                         _localNetworkFinder.isConnected = true;
                     }
@@ -153,104 +121,12 @@ public class ChatConnection : MonoBehaviour
                         Debug.Log(e);
                     }
                 }
-            
         });
-        
-
     }
     //needs a connection
-    //needs a method to send to endpoint
+    //needs a method to send to endpoint -- currently uses byte 45 as message waiting, 44 means no message
     //needs a method to receive from endpoint
     //needs a username
-
-    #region  importedAsyncMethods
-    //these are not being used in code. They are only examples for future if async methods are used.
-    public void AcceptCallback(IAsyncResult ar)
-    {
-        // Signal the main thread to continue.  
-        _manualResetEvent.Set();
-        // Get the socket that handles the client request.  
-        Socket listener = (Socket) ar.AsyncState;  
-        Socket handler = listener.EndAccept(ar);  
-  
-        // Create the state object.  
-        StateObject state = new StateObject();  
-        state.workSocket = handler;  
-        handler.BeginReceive( state.buffer, 0, StateObject.BufferSize, 0,  
-            new AsyncCallback(ReadCallback), state);  
-    }
-    public static void ReadCallback(IAsyncResult ar)
-    {
-        //TODO: uses a tag to indicate end of data received
-        //possible to receive incomplete package without end of stream notifier
-        String content = String.Empty;  
-  
-        // Retrieve the state object and the handler socket  
-        // from the asynchronous state object.  
-        StateObject state = (StateObject) ar.AsyncState;  
-        Socket handler = state.workSocket;  
-  
-        // Read data from the client socket.
-        int bytesRead = handler.EndReceive(ar);  
-  
-        if (bytesRead > 0) {  
-            // There  might be more data, so store the data received so far.  
-            state.sb.Append(Encoding.ASCII.GetString(  
-                state.buffer, 0, bytesRead));  
-  
-            // Check for end-of-file tag. If it is not there, read
-            // more data.  
-            content = state.sb.ToString();  
-            if (content.IndexOf("<EOF>") > -1) {  
-                // All the data has been read from the
-                // client. Display it on the console.  
-                Console.WriteLine("Read {0} bytes from socket. \n Data : {1}",  
-                    content.Length, content );  
-                // Echo the data back to the client.  
-                
-                //TODO: this is where the code continues after receive request is complete
-                Send(handler, content);  
-            } else {  
-                // Not all data received. Get more.  
-                handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,  
-                    new AsyncCallback(ReadCallback), state);  
-            }  
-        }  
-    }
-    private static void Send(Socket handler, String data)
-    {
-        // Convert the string data to byte data using ASCII encoding.  
-        byte[] byteData = Encoding.ASCII.GetBytes(data);  
-  
-        // Begin sending the data to the remote device.  
-        handler.BeginSend(byteData, 0, byteData.Length, 0,  
-            new AsyncCallback(SendCallback), handler);  
-        
-        //TODO: continues to sendcallback method after data is sent
-    }
-    private static void SendCallback(IAsyncResult ar)
-    {
-        try
-        {
-            // Retrieve the socket from the state object.  
-            Socket handler = (Socket) ar.AsyncState;  
-  
-            // Complete sending the data to the remote device.  
-            int bytesSent = handler.EndSend(ar);  
-            Console.WriteLine("Sent {0} bytes to client.", bytesSent);
-            //TODO: the socket is shut down in this example but will probably be left open and 
-            //      assigned next operation
-            handler.Shutdown(SocketShutdown.Both);  
-            handler.Close();  
-  
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e.ToString());  
-        }  
-    }
-    #endregion importedAsyncMethods
-    
     private IPGlobalProperties ipProperties;
     private TcpConnectionInformation[] tcpConnections;
     private IPEndPoint ipEnd;
@@ -327,13 +203,11 @@ public class ChatConnection : MonoBehaviour
         //TODO: need to fix this part asap
         //TODO: possible fixes include
         
-        
         //TODO: --- This was the selected method for now ---
         //TODO: passing data from another thread which updates a list on the main thread
         //TODO: --- end selected method ---
         //TODO: using UDP instead of TCP
         //TODO: possible asyncsocket approach
-
 
         //Need to establish a host button and a connect button
         //since tcp requires sequence, a host will have to listen, client sends first message, then host responds
