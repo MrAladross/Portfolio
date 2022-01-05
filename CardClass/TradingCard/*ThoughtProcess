@@ -1,0 +1,11 @@
+Due to complexity and volume of different trading cards, I decided a scriptable object approach would be appropriate.
+This protects the data by storing each card in a copyable text file, while also streamlining the process of making new cards.
+
+Since this was to be used in a tilemap turn-based game, cards could contain information about maximum movement distance. 
+
+
+**Tile Detector class has the method for displaying potential move spaces. The method involves populating a dictionary with potential
+values until move spaces have been used up. It allows the game logic to also check for obstacles or other potential reasons why a space
+might not be available. The algorithm is optimized for speed by checking if the dictionary already contains a key for potential movespaces. 
+This prevents the game loop from recalculating next positions from the same space a large number of times. The result is a character can
+move 5, 10, 15 tiles away and the selection indicators for all possible move spaces will be generated with no noticeable lag time. 
