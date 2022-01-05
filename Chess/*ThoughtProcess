@@ -1,0 +1,22 @@
+I wanted to create a game of chess for a tutorial series. I decided not to publish a tutorial series due to the complexity of the
+resulting game and limited time. 
+
+Methods: 
+
+Tilemap was used for the pieces and the chess board colors
+By using a tilemap, it would be very easy to add additional board colors, new pieces, and updated selection markers.
+
+A ChessSet was created with the idea custom game modes may be implemented in the future where the piece count wasn't standard.
+Each piece would derive from the same base class. The base class would use an abstract method to identify potential spaces to move. 
+Pieces would check all possible move locations, then a highlighter class would enable highlight tiles on a secondary tilemap,
+then the user could make his/her move.
+A sound was played on move completion. 
+
+
+
+*Special consideration was given to the pawn and the king for "En passant" and for castling
+**En passant was granted a separate class because calculations couldn't be handled within the pawn class as opponent move history mattered.
+***Array extension methods were used at the time the file was created to add or remove items. Lists would have been equally useful. 
+
+
+
