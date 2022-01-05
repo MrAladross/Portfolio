@@ -5,22 +5,30 @@ using UnityEngine;
 public class CardInfo : MonoBehaviour
 {
     [SerializeField]
-    private Card card;
+    private Card _card;
     [SerializeField]
-    private Player player;
+    private Player _player;
 
     public CardInfo()
     {
-        card = new Card();
-        player = new Player();
+        _card = new Card();
+        _player = new Player();
     }
 
     public void SetCard(Card c)
     {
-        card = c;
+        _card = c;
     }
     public void SetPlayer(Player p)
     {
-        player = p;
+        _player = p;
+    }
+    public Card GetCard()
+    {
+        return _card;
+    }
+    public Player GetPlayer()
+    {
+        return _player;
     }
 }
