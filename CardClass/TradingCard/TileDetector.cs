@@ -1,7 +1,5 @@
-﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.Tilemaps;
 using System.Linq;
 
@@ -21,13 +19,6 @@ public class TileDetector : MonoBehaviour
 
     public Tilemap foreGroundMap;
     public Tilemap midGroundMap;
-
-    public int moveDistance;
-
-    public int counter=0;
-
-    public bool selected = false;
-    public bool highlightedForMovement=false;
 
     private Vector3Int previous;
     
@@ -79,29 +70,21 @@ public class TileDetector : MonoBehaviour
         for (int i = 0; i < moveSpaces; ++i)
         {
             int x = currentTiles.Count;
-            Debug.Log(x + " number of tiles in row " + i);
             for (int j=0;j<x;++j)
             {
                 CheckCurrentTile(currentTiles.ElementAt(j).Key);
             }
-
+            Debug.Log(x + " number of tiles "+i + " spaces away.");
             currentTiles = new Dictionary<Vector3Int, TileBase>(upcomingTiles);
             upcomingTiles.Clear();
         }
-         
-        
         for (int i=0;i<moveTiles.Count;++i)
         {
             //insert logic here for handling different tilebases
-            for (int x = 0; x < blockingTiles.Length; ++x)
-            { if (moveTiles[moveTiles.ElementAt(i).Key] == blockingTiles[x])
-                    // goto nextTile;
-                    ;
-            }
+            
             foreGroundMap.SetTile(moveTiles.ElementAt(i).Key, glowTile);
             foreGroundMap.SetTileFlags(moveTiles.ElementAt(i).Key, TileFlags.None);
             foreGroundMap.SetColor(moveTiles.ElementAt(i).Key, Color.blue);
-            nextTile:;
         }
         currentTiles.Clear();
     }
@@ -122,66 +105,28 @@ public class TileDetector : MonoBehaviour
              leftTile = currentTile + Vector3Int.left;
              topLeftTile = currentTile + Vector3Int.up + Vector3Int.left;
         }
-        if (!moveTiles.ContainsKey(topRightTile))
+
+        void CheckNextTile(Vector3Int nextTile)
         {
-            for (int x = 0; x < blockingTiles.Length; ++x)
+            if (!moveTiles.ContainsKey(nextTile))
             {
-                if (midGroundMap.GetTile(topRightTile) == blockingTiles[x])
-                    goto t2;
+                for (int x = 0; x < blockingTiles.Length; ++x)
+                {
+                    if (midGroundMap.GetTile(nextTile) == blockingTiles[x])
+                        return;
+                }
+                moveTiles.Add(nextTile, midGroundMap.GetTile(nextTile));
+                upcomingTiles.Add(nextTile, midGroundMap.GetTile(nextTile));
             }
-            moveTiles.Add(topRightTile, midGroundMap.GetTile(topRightTile));
-            upcomingTiles.Add(topRightTile, midGroundMap.GetTile(topRightTile));
-        }t2:
-        if (!moveTiles.ContainsKey(rightTile))
-        {
-            for (int x = 0; x < blockingTiles.Length; ++x)
-            {
-                if (midGroundMap.GetTile(rightTile) == blockingTiles[x])
-                    goto t3;
-            }
-            moveTiles.Add(rightTile, midGroundMap.GetTile(rightTile));
-            upcomingTiles.Add(rightTile, midGroundMap.GetTile(rightTile));
-        }t3:
-        if (!moveTiles.ContainsKey(bottomRightTile))
-        {
-            for (int x = 0; x < blockingTiles.Length; ++x)
-            {
-                if (midGroundMap.GetTile(bottomRightTile) == blockingTiles[x])
-                    goto t4;
-            }
-            moveTiles.Add(bottomRightTile, midGroundMap.GetTile(bottomRightTile));
-            upcomingTiles.Add(bottomRightTile, midGroundMap.GetTile(bottomRightTile));
-        }t4:
-        if (!moveTiles.ContainsKey(bottomLeftTile))
-        {
-            for (int x = 0; x < blockingTiles.Length; ++x)
-            {
-                if (midGroundMap.GetTile(bottomLeftTile) == blockingTiles[x])
-                    goto t5;
-            }
-            moveTiles.Add(bottomLeftTile, midGroundMap.GetTile(bottomLeftTile));
-            upcomingTiles.Add(bottomLeftTile, midGroundMap.GetTile(bottomLeftTile));
-        }t5:
-        if (!moveTiles.ContainsKey(leftTile))
-        {
-            for (int x = 0; x < blockingTiles.Length; ++x)
-            {
-                if (midGroundMap.GetTile(leftTile) == blockingTiles[x])
-                    goto t6;
-            }
-            moveTiles.Add(leftTile, midGroundMap.GetTile(leftTile));
-            upcomingTiles.Add(leftTile, midGroundMap.GetTile(leftTile));
-        }t6:
-        if (!moveTiles.ContainsKey(topLeftTile))
-        {
-            for (int x = 0; x < blockingTiles.Length; ++x)
-            {
-                if (midGroundMap.GetTile(topLeftTile) == blockingTiles[x])
-                    goto endOfTiles;
-            }
-            moveTiles.Add(topLeftTile, midGroundMap.GetTile(topLeftTile));
-            upcomingTiles.Add(topLeftTile, midGroundMap.GetTile(topLeftTile));
-        }endOfTiles:;
+        }
+        
+        CheckNextTile(topRightTile);
+        CheckNextTile(rightTile);
+        CheckNextTile(bottomRightTile);
+        CheckNextTile(bottomLeftTile);
+        CheckNextTile(leftTile);
+        CheckNextTile(topLeftTile);
+       
     }
     
     
@@ -194,7 +139,6 @@ public class TileDetector : MonoBehaviour
         foreGroundMap.SetTile(previousLocation, null);
         midGroundMap.SetTile(selectedLocation, previousTile);
         midGroundMap.SetTile(previousLocation, selectedTile);
-        selected = false;
 
     }
 
@@ -262,4 +206,6 @@ public class TileDetector : MonoBehaviour
         return false;
     }
 }
+
+
 
