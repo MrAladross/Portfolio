@@ -10,8 +10,8 @@ using UnityEngine.UI;
 
 public class LocalNetworkFinder : MonoBehaviour
 { 
-    [SerializeField] public HashSet<string> ipaddresses = new HashSet<string>();
-    [SerializeField] public Text debugText;
+    public HashSet<string> ipaddresses = new HashSet<string>();
+    public Text debugText;
     public ChatConnection _chatConnection;
     [SerializeField] private InputField friendCodeInput;
     
