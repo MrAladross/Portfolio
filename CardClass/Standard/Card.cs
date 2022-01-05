@@ -2,11 +2,11 @@
 using UnityEngine;
 using System;
 [Serializable]
-public class Card 
+class Card 
 {
-    public int _value;
+    private int _value;
     public enum Suit { hearts, diamonds, clubs, spades };
-    public Suit _suit;
+    private Suit _suit;
 
     public Card()
     {
@@ -16,8 +16,15 @@ public class Card
     public Card(int value, Suit suit)
     {
         _value = value;
-            _suit = suit;
+        _suit = suit;
     }
+    public int GetValue(){
+         return _value;
+    }
+    public Suit GetSuit(){
+         return _suit;
+    }
+    
 
 
 }
