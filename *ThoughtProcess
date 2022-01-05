@@ -1,0 +1,10 @@
+My niece was having trouble with math, so I used the 30 minutes I had at the time to write a quick app and uploaded it to her iPad. 
+She practiced enough to improve from being behind in class to being at the top of her class.
+
+It had addition and subtraction, and I also implemented a visual option as well where some circles were instantiated to match the numbers
+being added or subtracted. The visual option was a toggle setting that could be turned off.
+
+Other features included a color toggle, difficulty setting, and the option to focus on addition or subtraction.
+
+Questions would increase in difficulty after certain score benchmarks were passed. 
+
