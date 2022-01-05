@@ -1,0 +1,8 @@
+A card is an easy item to create a data structure around. 
+
+In order to get a good cross between writing game logic and displaying UI, I like to create:
+-the basic data class for cards, and 
+-a UI centered monobehaviour that contains a reference to the data class. 
+
+This way, player input can be gathered from mouseposition raycasts. Basic data is gathered from the info monobehaviour, then
+the data class is passed around as needed for game logic.
