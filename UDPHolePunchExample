@@ -30,11 +30,11 @@ public class UDPHolePunchTest : MonoBehaviour
                 using (UdpClient client = new UdpClient())
                 {
                     client.ExclusiveAddressUse = false;
-                    var froml = new IPEndPoint(0, 0);
+                    var from = new IPEndPoint(0, 0);
                     client.Client.Bind(new IPEndPoint(IPAddress.Any, 27800));
                     byte[] b = Encoding.ASCII.GetBytes("sent by pc");
                     client.Send(b, b.Length, new IPEndPoint(IPAddress.Parse(phoneIP), 27800));
-                    var buff = client.Receive(ref froml);
+                    var buff = client.Receive(ref from);
                     
                     messageReceived.Add(Encoding.ASCII.GetString(buff));
                 }
@@ -54,11 +54,11 @@ public class UDPHolePunchTest : MonoBehaviour
             {
                 using (UdpClient client = new UdpClient())
                 {
-                    var froml = new IPEndPoint(0, 0);
+                    var from = new IPEndPoint(0, 0);
                     client.ExclusiveAddressUse = false;
                     client.Client.Bind(new IPEndPoint(IPAddress.Any, 27800));
                     byte[] b = Encoding.ASCII.GetBytes("sent by phone");
-                   var buff= client.Receive(ref froml);
+                   var buff= client.Receive(ref from);
                     client.Send(b, b.Length, new IPEndPoint(IPAddress.Parse(routerIP), 27800));
                     messageReceived.Add(Encoding.ASCII.GetString(buff));
                 }
