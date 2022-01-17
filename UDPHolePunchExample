@@ -15,8 +15,6 @@ public class UDPHolePunchTest : MonoBehaviour
     private List<string> messageReceived = new List<string>();
     [SerializeField]
     private GameObject displayText;
-
-    private bool isListening = true;
     private Task _task;
     [SerializeField]
     private string phoneIP;
@@ -31,14 +29,13 @@ public class UDPHolePunchTest : MonoBehaviour
                 using (UdpClient client = new UdpClient())
                 {
                     client.ExclusiveAddressUse = false;
-                    var from = new IPEndPoint(0, 0);
+                    var froml = new IPEndPoint(0, 0);
                     client.Client.Bind(new IPEndPoint(IPAddress.Any, 27800));
-                    byte[] b = new byte[1];
-                    b[0] = 45;
+                    byte[] b = Encoding.ASCII.GetBytes("sent by pc");
                     client.Send(b, b.Length, new IPEndPoint(IPAddress.Parse(phoneIP), 27800));
-                    var buff = client.Receive(ref from);
+                    var buff = client.Receive(ref froml);
                     
-                    messageReceived.Add("got one more");
+                    messageReceived.Add(Encoding.ASCII.GetString(buff));
                 }
             }
             catch (Exception e)
@@ -56,13 +53,13 @@ public class UDPHolePunchTest : MonoBehaviour
             {
                 using (UdpClient client = new UdpClient())
                 {
-                    var from = new IPEndPoint(0, 0);
+                    var froml = new IPEndPoint(0, 0);
                     client.ExclusiveAddressUse = false;
                     client.Client.Bind(new IPEndPoint(IPAddress.Any, 27800));
-                    byte[] b = new byte[1];
-                    b[0] = 45;
-                   var buff= client.Receive(ref from);
+                    byte[] b = Encoding.ASCII.GetBytes("sent by phone");
+                   var buff= client.Receive(ref froml);
                     client.Send(b, b.Length, new IPEndPoint(IPAddress.Parse(routerIP), 27800));
+                    messageReceived.Add(Encoding.ASCII.GetString(buff));
                 }
             }
             catch (Exception e)
@@ -72,21 +69,15 @@ public class UDPHolePunchTest : MonoBehaviour
 
         });
     }
-
     private void Update()
     {
         if (messageReceived.Count > 0)
         {
-            messageReceived.Remove(messageReceived[0]);
             displayText.SetActive(true);
+            displayText.GetComponent<Text>().text = messageReceived[0];
+            messageReceived.Remove(messageReceived[0]);
             Invoke(nameof(TurnOff),3f);
         }
     }
-
-    private void OnApplicationQuit()
-    {
-        isListening = false;
-    }
-
     void TurnOff() => displayText.SetActive(false);
 }
