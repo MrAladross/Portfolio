@@ -1,0 +1,92 @@
+using System.Collections.Generic;
+using UnityEngine;
+using System;
+using System.Net;
+using System.Net.Sockets;
+using System.Threading.Tasks;
+public class UDPHolePunchTest : MonoBehaviour
+{
+    
+    //pc is behind router. router is at ipv4 address routerIP downstream behind router through WAN port (connection not allowed)
+    //phone is ipv4 address phoneIP upstream through LAN port (connection allowed)
+    //Send from phone to computer, should go through only after computer to phone
+    //send message from computer to phone, should go through and enable text.
+    
+    private List<string> messageReceived = new List<string>();
+    [SerializeField]
+    private GameObject displayText;
+
+    private bool isListening = true;
+    private Task _task;
+    [SerializeField]
+    private string phoneIP;
+    [SerializeField]
+    private string routerIP;
+    public void SendToPhone()
+    {
+        System.Threading.Tasks.Task.Run(() =>
+        {
+            try
+            {
+                using (UdpClient client = new UdpClient())
+                {
+                    client.ExclusiveAddressUse = false;
+                    var froml = new IPEndPoint(0, 0);
+                    client.Client.Bind(new IPEndPoint(IPAddress.Any, 27800));
+                    byte[] b = new byte[1];
+                    b[0] = 45;
+                    client.Send(b, b.Length, new IPEndPoint(IPAddress.Parse(phoneIP), 27800));
+                    var buff = client.Receive(ref froml);
+                    
+                    messageReceived.Add("got one more");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e + " failed to go through");
+            }
+        });
+    }
+
+    public void SendToPC()
+    {
+        System.Threading.Tasks.Task.Run(() =>
+        {
+            try
+            {
+                using (UdpClient client = new UdpClient())
+                {
+                    var froml = new IPEndPoint(0, 0);
+                    client.ExclusiveAddressUse = false;
+                    client.Client.Bind(new IPEndPoint(IPAddress.Any, 27800));
+                    byte[] b = new byte[1];
+                    b[0] = 45;
+                   var buff= client.Receive(ref froml);
+                    client.Send(b, b.Length, new IPEndPoint(IPAddress.Parse(routerIP), 27800));
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e + " failed to go through");
+            }
+
+        });
+    }
+
+    private void Update()
+    {
+        if (messageReceived.Count > 0)
+        {
+            messageReceived.Remove(messageReceived[0]);
+            displayText.SetActive(true);
+            Invoke(nameof(TurnOff),3f);
+        }
+    }
+
+    private void OnApplicationQuit()
+    {
+        isListening = false;
+    }
+
+    void TurnOff() => displayText.SetActive(false);
+}
